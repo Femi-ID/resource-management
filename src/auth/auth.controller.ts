@@ -7,7 +7,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User } from './schemas/auth.schema';
 import { Model } from 'mongoose';
 
-@ApiTags('users')
+// @ApiTags('User')
 @Controller('v1/auth')
 export class AuthController {
   constructor(
@@ -26,6 +26,7 @@ export class AuthController {
     return this.authService.signIn(loginUserDto);
   }
 
+  @ApiTags('User')
   @ApiOkResponse({
     type: User,
     description: 'The users Id should sent as a parameter in the url',
