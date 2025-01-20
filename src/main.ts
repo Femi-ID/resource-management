@@ -11,7 +11,7 @@ async function bootstrap() {
     .setTitle('Resource Management API')
     .setDescription('API documentation for the resource mgt application.')
     .setVersion('1.0')
-    .addTag('resources')
+    .addTag('Resources')
     .build();
 
   const documentFactory = () => SwaggerModule.createDocument(app, config);
