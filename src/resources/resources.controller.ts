@@ -4,8 +4,9 @@ import { Resource } from './schemas/resource.schema';
 import { Model } from 'mongoose';
 import { ResourcesService } from './resources.service';
 import { CreateResourceDto } from './dto/create-resource.dto';
-import { periodFilter } from './enums';
+import { periodFilter, ResourceType } from './enums';
 import { ApiCreatedResponse, ApiOkResponse } from '@nestjs/swagger';
+import { DashboardFilterDto } from './dto/dashboard-data.dto';
 
 @Controller('v1/resources')
 export class ResourcesController {
@@ -20,7 +21,10 @@ export class ResourcesController {
     return this.resourceService.createResource(createResourceDto);
   }
 
-  @ApiOkResponse() /*response of the function here */
+  @ApiOkResponse({
+    description:
+      'Response- returns each individual resource information with the total and average consumption.',
+  }) /*response of the function here */
   @Get('retrieve/:userId')
   async retrieveResources(
     @Param('userId') userId: string,
@@ -29,11 +33,27 @@ export class ResourcesController {
     return this.resourceService.getResourcesByPeriod(userId, period);
   }
 
+  @ApiOkResponse({
+    description:
+      'Response- the total and average resource consumption over a specified period',
+  })
   @Get('summary/:userId')
   async getResourcesSummary(
     @Query('period') period: periodFilter,
     @Param('userId') userId: string,
   ) {
     return this.resourceService.calculateTotalsAndAverages(userId, period);
+  }
+
+  @ApiOkResponse({
+    description:
+      'Response- the data (bar/pie chart) representing the resource consumption over a specific period',
+  })
+  @Get('dashboard-data/:userId')
+  async getDashboardData(
+    @Param('userId') userId: string,
+    @Query() dashboardFilter: DashboardFilterDto,
+  ) {
+    return this.resourceService.generateDashboardData(userId, dashboardFilter);
   }
 }

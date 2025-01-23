@@ -27,7 +27,7 @@ export class AuthController {
     return this.authService.signIn(loginUserDto);
   }
 
-  @ApiTags('User')
+  // @ApiTags('User')
   @ApiOkResponse({
     type: User,
     description: 'The userId sent as a parameter in the url',
