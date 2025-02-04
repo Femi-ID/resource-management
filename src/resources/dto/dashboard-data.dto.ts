@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { periodFilter, ResourceType } from '../enums';
+import { ChartType, periodFilter, ResourceType } from '../enums';
 import { IsNotEmpty, IsString } from 'class-validator';
 
 export class DashboardFilterDto {
@@ -12,4 +12,9 @@ export class DashboardFilterDto {
   @IsNotEmpty()
   @IsString()
   trackerType: ResourceType;
+
+  @ApiProperty({ required: true })
+  @IsNotEmpty()
+  @IsString()
+  chartType: ChartType;
 }

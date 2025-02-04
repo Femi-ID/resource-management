@@ -4,9 +4,11 @@ import { Resource } from './schemas/resource.schema';
 import { Model } from 'mongoose';
 import { ResourcesService } from './resources.service';
 import { CreateResourceDto } from './dto/create-resource.dto';
-import { periodFilter, ResourceType } from './enums';
+import { periodFilter, ResourceType, WaterCategory } from './enums';
 import { ApiCreatedResponse, ApiOkResponse } from '@nestjs/swagger';
 import { DashboardFilterDto } from './dto/dashboard-data.dto';
+import { ObjectId } from 'mongoose';
+import { ResourceFilterDto } from './dto/resource-filter.dto';
 
 @Controller('v1/resources')
 export class ResourcesController {
@@ -23,27 +25,45 @@ export class ResourcesController {
 
   @ApiOkResponse({
     description:
-      'Response- returns each individual resource information with the total and average consumption.',
+      'Response- returns all resources information with the total and average consumption. (filter: period, resourceType)',
   }) /*response of the function here */
-  @Get('retrieve/:userId')
+  @Get('retrieve-all/:userId')
   async retrieveResources(
     @Param('userId') userId: string,
-    @Query('period') period?: periodFilter,
+    // @Query('period') period?: periodFilter,
+    // @Query('trackerType') trackerType?: ResourceType,
+    // @Query('waterCategory') waterCategory?: WaterCategory,
+    @Query() queryFilterDto?: ResourceFilterDto,
   ) {
-    return this.resourceService.getResourcesByPeriod(userId, period);
+    return this.resourceService.getResourcesByPeriod(userId, queryFilterDto);
   }
 
   @ApiOkResponse({
     description:
-      'Response- the total and average resource consumption over a specified period',
+      'Response- returns an individual resource information with the total and average consumption.',
   })
-  @Get('summary/:userId')
-  async getResourcesSummary(
-    @Query('period') period: periodFilter,
-    @Param('userId') userId: string,
+  @Get('id/:resourceId/:userId')
+  async getResource(
+    @Param('resourceId') resourceId: ObjectId,
+    @Param('userId') userId: ObjectId,
   ) {
-    return this.resourceService.calculateTotalsAndAverages(userId, period);
+    return this.resourceService.getSingleResource({ userId, resourceId });
   }
+
+  @Get('id/:resourceId/:userId')
+  async updateResource() {}
+
+  // @ApiOkResponse({
+  //   description:
+  //     'Response- the total and average resource consumption over a specified period',
+  // })
+  // @Get('summary/:userId')
+  // async getResourcesSummary(
+  //   @Query('period') period: periodFilter,
+  //   @Param('userId') userId: string,
+  // ) {
+  //   return this.resourceService.calculateTotalsAndAverages(userId, period);
+  // }
 
   @ApiOkResponse({
     description:
@@ -51,7 +71,7 @@ export class ResourcesController {
   })
   @Get('dashboard-data/:userId')
   async getDashboardData(
-    @Param('userId') userId: string,
+    @Param('userId') userId: ObjectId,
     @Query() dashboardFilter: DashboardFilterDto,
   ) {
     return this.resourceService.generateDashboardData(userId, dashboardFilter);
