@@ -22,6 +22,7 @@ import { ChartType, periodFilter, ResourceType, WaterCategory } from './enums';
 import { DashboardFilterDto } from './dto/dashboard-data.dto';
 import { ResourceInfoDto, UpdateResourceInfoDto } from './dto/resource-info.dto';
 import { ResourceFilterDto } from './dto/resource-filter.dto';
+import { isStringObject } from 'util/types';
 
 @Injectable()
 export class ResourcesService {
@@ -62,28 +63,41 @@ export class ResourcesService {
   }
 
   async updateResource(
-    userId: ObjectId,
+    resourceId: ObjectId,
     updatedResourceInfoDto: UpdateResourceInfoDto,
   ) {
-    const resource = await this.resourceModel.findOneAndUpdate(
-      userId,
-      updatedResourceInfoDto,
-      { new: true },
-    );
-    if (!resource)
-      throw new NotFoundException('Resource for this owner does not exist!!');
-    return { resource, message: 'resource successfully UPDATED.' };
+    const resourceIdType = isStringObject(resourceId);
+    try {
+      const resource = await this.resourceModel.findByIdAndUpdate(
+        resourceId,
+        // updatedResourceInfoDto.userId,
+        updatedResourceInfoDto,
+        { new: true },
+      );
+      if (!resource)
+        throw new NotFoundException('Resource for this owner does not exist!!');
+      return { resource, message: 'resource successfully UPDATED.' };
+    } catch (error) {
+      console.log(error.message);
+      return error.message;
+    }
   }
 
-  async deleteResource(resourceInfoDto: ResourceInfoDto) {
-    const { userId, resourceId } = resourceInfoDto;
-    const resource = await this.resourceModel.findOneAndDelete({
-      userId,
-      resourceId,
-    });
-    if (!resource)
-      throw new NotFoundException('Resource for this owner does not exist!!');
-    return { resource, message: 'resource successfully DELETED.' };
+  async deleteResource(userId: string, resourceId: string) {
+    // const { userId, resourceId } = resourceInfoDto;
+    try {
+      const resource = await this.resourceModel.findOne({
+        _id: resourceId,
+        userId,
+      });
+      if (!resource)
+        throw new NotFoundException('Resource for this owner does not exist!!');
+      await this.resourceModel.deleteOne({ _id: resourceId });
+      return { resource, message: 'resource successfully DELETED.' };
+    } catch (error) {
+      console.log(error.message);
+      return error.message;
+    }
   }
 
   async getResourcesByPeriod(

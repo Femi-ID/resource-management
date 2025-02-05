@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Resource } from './schemas/resource.schema';
 import { Model } from 'mongoose';
@@ -9,6 +9,7 @@ import { ApiCreatedResponse, ApiOkResponse } from '@nestjs/swagger';
 import { DashboardFilterDto } from './dto/dashboard-data.dto';
 import { ObjectId } from 'mongoose';
 import { ResourceFilterDto } from './dto/resource-filter.dto';
+import { ResourceInfoDto, UpdateResourceInfoDto } from './dto/resource-info.dto';
 
 @Controller('v1/resources')
 export class ResourcesController {
@@ -42,7 +43,7 @@ export class ResourcesController {
     description:
       'Response- returns an individual resource information with the total and average consumption.',
   })
-  @Get('id/:resourceId/:userId')
+  @Get('get/:resourceId/:userId')
   async getResource(
     @Param('resourceId') resourceId: ObjectId,
     @Param('userId') userId: ObjectId,
@@ -50,8 +51,30 @@ export class ResourcesController {
     return this.resourceService.getSingleResource({ userId, resourceId });
   }
 
-  @Get('id/:resourceId/:userId')
-  async updateResource() {}
+  @ApiOkResponse({
+    description:
+      'Response- returns the updated individual resource information.',
+  })
+  @Put('update/:resourceId/')
+  async updateResource(
+    // @Param('userId') userId?: string,
+    @Param('resourceId') resourceId: ObjectId,
+    @Body() updateResourceInfoDto: UpdateResourceInfoDto,
+  ) {
+    return this.resourceService.updateResource(
+      resourceId,
+      updateResourceInfoDto,
+    );
+  }
+
+  @Delete('delete/:resourceId/user/:userId')
+  async deleteResource(
+    @Param('resourceId') resourceId: string,
+    @Param('userId') userId: string,
+    // @Param() deleteResource: ResourceInfoDto,
+  ) {
+    return this.resourceService.deleteResource(userId, resourceId);
+  }
 
   // @ApiOkResponse({
   //   description:

@@ -27,7 +27,7 @@ export class UpdateResourceInfoDto {
   @ApiProperty({ required: true })
   @IsMongoId()
   @IsNotEmptyObject()
-  resourceId: ObjectId;
+  userId: string;
 
   @ApiProperty({ required: false })
   @IsEnum(ResourceType, {
